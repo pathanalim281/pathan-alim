@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Business AI Tool</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #eef2f7;
+}
+
+/* Login Screen */
+#loginPage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    width: 300px;
+}
+
+header {
+    background: linear-gradient(90deg,#2c3e50,#34495e);
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.container {
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    background: #3498db;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+.poster {
+    margin-top: 15px;
+    padding: 20px;
+    border-radius: 10px;
+    background: linear-gradient(45deg,#6dd5fa,#ffffff);
+    text-align: center;
+}
+
+.customer-item {
+    display: flex;
+    justify-content: space-between;
+    background: #f4f6f9;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+}
+
+.small-btn {
+    width: auto;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+    <div class="login-box">
+        <h3>🔐 Login</h3>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+
+<header>
+    <h2>🚀 Local Business AI Tool</h2>
+    <h3>Developer: Alim Pathan</h3>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h3>🎨 Poster Generator</h3>
+<input type="text" id="shopName" placeholder="Shop Name">
+<input type="text" id="offer" placeholder="Offer">
+<button onclick="generatePoster()">Generate Poster</button>
+<div id="posterOutput" class="poster" style="display:none;"></div>
+</div>
+
+<div class="card">
+<h3>👥 Customer Manager</h3>
+<input type="text" id="custName" placeholder="Customer Name">
+<input type="text" id="custPhone" placeholder="Mobile Number">
+<button onclick="saveCustomer()">Save Customer</button>
+<div id="customerList"></div>
+</div>
+
+<div class="card">
+<h3>📲 WhatsApp Message</h3>
+<textarea id="msgText"></textarea>
+<button onclick="sendAll()">Send to All</button>
+</div>
+
+</div>
+</div>
+
+<script>
+let customers = JSON.parse(localStorage.getItem("customers")) || [];
+
+/* LOGIN FUNCTION */
+function login() {
+    let user = document.getElementById("username").value;
+    let pass = document.getElementById("password").value;
+
+    if(user === "Alpha Tech" && pass === "Alpha Tech Innovations") {
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+    } else {
+        alert("Wrong ❌ Username or Password");
+    }
+}
+
+/* APP FUNCTIONS */
+function generatePoster() {
+    let name = document.getElementById("shopName").value;
+    let offer = document.getElementById("offer").value;
+
+    let poster = document.getElementById("posterOutput");
+    poster.style.display = "block";
+    poster.innerHTML = `<h2>${name}</h2><p>${offer}</p>`;
+}
+
+function saveCustomer() {
+    let name = document.getElementById("custName").value;
+    let phone = document.getElementById("custPhone").value;
+
+    customers.push({name, phone});
+    localStorage.setItem("customers", JSON.stringify(customers));
+    displayCustomers();
+}
+
+function displayCustomers() {
+    let list = document.getElementById("customerList");
+    list.innerHTML = "";
+
+    customers.forEach(c => {
+        list.innerHTML += `
+            <div class="customer-item">
+                <span>${c.name} - ${c.phone}</span>
+                <button class="small-btn" onclick="sendMsg('${c.phone}')">Send</button>
+            </div>
+        `;
+    });
+}
+
+function sendMsg(phone) {
+    let msg = document.getElementById("msgText").value || "Check our offer!";
+    let url = "https://wa.me/91" + phone + "?text=" + encodeURIComponent(msg);
+    window.open(url, "_blank");
+}
+
+function sendAll() {
+    let msg = document.getElementById("msgText").value || "Check our offer!";
+    customers.forEach(c => {
+        let url = "https://wa.me/91" + c.phone + "?text=" + encodeURIComponent(msg);
+        window.open(url, "_blank");
+    });
+}
+
+displayCustomers();
+</script>
+
+</body>
+</html>
